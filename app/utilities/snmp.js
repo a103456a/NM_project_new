@@ -12,7 +12,7 @@ function get(OID, HOST) {
                 reject(new Error(err));
             } else {
                 console.log(varbinds[0].oid + ' = ' + varbinds[0].value + ' (' + varbinds[0].type + ')');
-                resolve(varvinds);
+                resolve(varbinds);
             }
 
             session.close();
@@ -20,6 +20,6 @@ function get(OID, HOST) {
     });
 }
 
-module.export = {
+module.exports = {
     get: get
 };
