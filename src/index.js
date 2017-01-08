@@ -1,9 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
-import './index.css';
+import { Router, Route, hashHistory, IndexRoute } from 'react-router';
+import App from './components/App';
+import Home from './components/Home';
+
+
+const routes = (
+    <Route path="/" component={App}>
+        <IndexRoute component={Home} />
+    </Route>
+);
 
 ReactDOM.render(
-  <App />,
-  document.getElementById('root')
+    <Router routes={routes} history={hashHistory} />,
+    document.getElementById('app')
 );
+
+
+// <Route path="/repos/:name" component={Repos} />
