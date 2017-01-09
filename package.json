@@ -22,6 +22,7 @@
     "electron-rebuild": "^1.5.5"
   },
   "dependencies": {
+    "hammer": "0.0.5",
     "ipc": "0.0.1",
     "jquery": "^3.1.1",
     "snmp-native": "^1.1.0"
