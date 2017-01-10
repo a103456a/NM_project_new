@@ -6,7 +6,8 @@
   "scripts": {
     "start": "electron .",
     "rebuild": "electron-rebuild -f -w yourmodule",
-    "build": "electron-packager . NM_project --arch=ia32 --version=1.0.0 --ignore=node_modules/electron-*"
+    "build32": "electron-packager . NM_project --arch=ia32 --version=1.0.0 --ignore=node_modules/electron-*",
+    "build64": "electron-packager . NM_project --arch=x64 --version=1.0.0 --ignore=node_modules/electron-*"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [

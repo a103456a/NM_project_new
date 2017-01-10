@@ -85,7 +85,12 @@ reconnect.addEventListener('click', function () {
 
 // utility functions
 // initialize overview
+let intervalUpTime;
 function overview() {
+    if (intervalUpTime) {
+        clearInterval(intervalUpTime);
+     }
+
     // show agent IP
     let showIP = document.getElementById('showIP');
     showIP.innerText = HOST;
@@ -149,7 +154,7 @@ function overview() {
         upt.innerText = upTime(result[0].value);
 
         let q = result[0].value;
-        window.setInterval(() => {
+        intervalUpTime = window.setInterval(() => {
             q += 100;
             upt.innerText = upTime(q);
         }, 1000);
