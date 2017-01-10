@@ -15,6 +15,9 @@ let ifType = ['other', 'regular1822', 'hdh1822', 'ddn-x25', 'rfc877-x25', 'ether
 
 // main process
 startUp();
+setInterval(() => { 
+    overview();
+}, 10000);
 
 // action listeners
 const ipc = require('electron').ipcRenderer;
@@ -28,10 +31,7 @@ let showHostName = document.getElementById('showHostName');
 showHostName.addEventListener('click', function () {
     document.getElementById('edit-hostName').style.display = '';
     document.getElementById('editHostName').style.display = '';
-
-    let dvcName = document.getElementById('deviceName');
-    dvcName.style.display = 'none';
-
+    document.getElementById('deviceName').style.display = 'none';
     document.getElementById('showHostName').style.display = 'none';
 });
 
@@ -40,6 +40,28 @@ editHostName.addEventListener('click', function () {
     let dvcName = document.getElementById('edit-hostName');
 
     session.set({ oid: '.1.3.6.1.2.1.1.5.0', value: dvcName.value, type: 4 }, (error, result) => {
+        if (!error) {
+            alert('修改成功!');
+            overview();
+        } else {
+            alert('修改失敗，請再試一次');
+        }
+    });
+});
+
+let showLocation = document.getElementById('showLoc');
+showLocation.addEventListener('click', function () {
+    document.getElementById('edit-location').style.display = '';
+    document.getElementById('editLoc').style.display = '';
+    document.getElementById('showLoc').style.display = 'none';
+    document.getElementById('showLocation').style.display = 'none';
+});
+
+let editLocation = document.getElementById('editLoc');
+editLocation.addEventListener('click', function () {
+    let location = document.getElementById('edit-location');
+
+    session.set({ oid: '.1.3.6.1.2.1.1.6.0', value: location.value, type: 4 }, (error, result) => {
         if (!error) {
             alert('修改成功!');
             overview();
@@ -89,6 +111,19 @@ function overview() {
         editName.value = result[0].value;
     });
 
+    // show physical location
+    session.get({ oid: '.1.3.6.1.2.1.1.6.0' }, (error, result) => {
+        document.getElementById('showLoc').style.display = '';
+        document.getElementById('editLoc').style.display = 'none';
+        
+        let editLocation = document.getElementById('edit-location');
+        editLocation.style.display = 'none';
+
+        var show = document.getElementById('showLocation');
+        show.style.display = '';
+        show.innerText = result[0].value;
+        editLocation.value = result[0].value;
+    });
 
     // get agent MAC address
     session.get({ oid: '.1.3.6.1.2.1.2.2.1.6.1' }, (error, result) => {
@@ -99,6 +134,12 @@ function overview() {
     // total number of input datagrams received from interfaces
     session.get({ oid: '.1.3.6.1.2.1.4.3.0' }, (error, result) => {
         var show = document.getElementById('showRcv');
+        show.innerText = result[0].value;
+    });
+
+    // total number of output datagrams received from interfaces
+    session.get({ oid: '.1.3.6.1.2.1.4.10.0' }, (error, result) => {
+        var show = document.getElementById('showOpt');
         show.innerText = result[0].value;
     });
 
@@ -116,8 +157,12 @@ function overview() {
 }
 
 // initialize port information
+let inTraffic = [0, 0, 0, 0, 0, 0, 0, 0];
+let outTraffic = [0, 0, 0, 0, 0, 0, 0, 0];
 function portInfo() {
     $('.portTable').empty();
+
+
     // get port table
     for (let i = 1; i <= 8; i++) {
         // ifType
@@ -125,13 +170,23 @@ function portInfo() {
         let oids = [
             '.1.3.6.1.2.1.2.2.1.3.' + i.toString(),
             '.1.3.6.1.2.1.2.2.1.5.' + i.toString(),
-            '.1.3.6.1.2.1.2.2.1.8.' + i.toString()
+            '.1.3.6.1.2.1.2.2.1.7.' + i.toString(),
+            '.1.3.6.1.2.1.2.2.1.8.' + i.toString(),
+            '.1.3.6.1.2.1.2.2.1.10.' + i.toString(),
+            '.1.3.6.1.2.1.2.2.1.16.' + i.toString()
         ];
-
+        
+        
         session.getAll({ oids: oids }, function (error, varbinds) {
+            let btnColor = (varbinds[2].value == 2) ? 'light-green' : 'red';
+            let barColor = (varbinds[2].value == 1) ? ((varbinds[3].value == 1) ? 'light-green' : 'grey') : 'red  lighten-1';
+            inTraffic[i - 1] = varbinds[4].value;
+            outTraffic[i - 1] = varbinds[5].value;
+
+
             $('.portTable').append(
                 `<li>
-                    <div class="collapsible-header green lighten-1">Port ${i}</div>
+                    <div class="collapsible-header ${barColor}">Port ${i}</div>
                     <div class="collapsible-body grey lighten-4">
                         <div class="row">
                             <div class="col s10 m10 l10 offset-s1 offset-m1 offset-l1">
@@ -144,6 +199,14 @@ function portInfo() {
                                     </thead>
                                     <tbody>
                                         <tr>
+                                            <td>運作狀態</td>
+                                            <td ${(varbinds[2].value == 1) ? '' :'class=\"red-text text-darken-2\"'}>${varbinds[2].value == 1 ? '啟用' : '停用'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>使用狀態</td>
+                                            <td>${varbinds[3].value == 1 ? '使用中' : '非使用中'}</td>
+                                        </tr>
+                                        <tr>
                                             <td>介面型態</td>
                                             <td>${ifType[varbinds[0].value - 1]}</td>
                                         </tr>
@@ -151,32 +214,83 @@ function portInfo() {
                                             <td>傳輸速度</td>
                                             <td>${varbinds[1].value / 1000000} Mbps</td>
                                         </tr>
+                                        
                                         <tr>
-                                            <td>運作狀態</td>
-                                            <td ${(varbinds[2].value) ? '' :'class=\"red-text text-darken-2\"'}>${varbinds[2].value ? '啟用' : '停用'}</td>
+                                            <td>輸入流量</td>
+                                            <td id="inTraffic${i}">載入中...</td>
                                         </tr>
                                         <tr>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
+                                            <td>輸出流量</td>
+                                            <td id="outTraffic${i}">載入中...</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <div class="row">
-                            <div>
-                                <a id="${i}enable" class="waves-effect waves-light light-green btn">啟用</a>
-                                <a id="${i}disable" class="waves-effect waves-light red btn">停用</a>
+                            <div class="col s6 m6 l6 offset-s5 offset-m5 offset-l5">
+                                <a id="${i}toolBtn" class="waves-effect waves-light btn ${btnColor}" >${varbinds[2].value == 1 ? '停用' : '啟用'}</a>
                             </div>
                         </div>
                     </div>
                 </li>`);
         });
     }
+
+    setInterval(() => {
+        for (let i = 1; i <= 8; i++) {
+            let oidTraffic = [
+                '.1.3.6.1.2.1.2.2.1.10.' + i.toString(),
+                '.1.3.6.1.2.1.2.2.1.16.' + i.toString()
+            ];
+
+            session.getAll({ oids: oidTraffic }, (error, varbinds) => {
+                let inTraff = document.getElementById('inTraffic' + i.toString());
+                inTraff.innerText = ((varbinds[0].value - inTraffic[i - 1]) / 500000).toFixed(3) + ' Mbps';
+                inTraffic[i - 1] = varbinds[0].value;
+
+                let outTraff = document.getElementById('outTraffic' + i.toString());
+                outTraff.innerText = ((varbinds[1].value - outTraffic[i - 1]) / 500000).toFixed(3) + ' Mbps';
+                outTraffic[i - 1] = varbinds[1].value;
+            });
+        }
+    }, 5000);
+
+    
+    let interval = setInterval(() => {
+        let toolButton = document.getElementById('1toolBtn');
+
+        if (toolButton) {
+            // eventlistener for tool botton that enable or disable a port
+            for (let i = 1; i <= 8; i++) {
+                let toolButton = document.getElementById(i + 'toolBtn');
+
+                toolButton.addEventListener('click', function () {
+                    let port = i.toString();
+                    console.log(port);
+                    let value = 1;
+
+                    if (toolButton.innerText == '啟用') {
+                        value = 1;
+                    } else {
+                        value = 2;
+                    }
+
+                    session.set({ oid: '.1.3.6.1.2.1.2.2.1.7.' + port, value: value, type: 2 }, (error, result) => {
+                        if (!error) {
+                            alert('完成');
+                            portInfo();
+                        } else {
+                            alert('失敗，請再試一次');
+                            console.dir(error);
+                        }
+                    });
+                });
+            }
+
+            clearInterval(interval);
+        }
+    }, 3000);
 }
 
 function startUp() {

@@ -1,11 +1,12 @@
 {
-  "name": "electron-quick-start",
+  "name": "NM_project_new",
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "rebuild": "electron-rebuild -f -w yourmodule"
+    "rebuild": "electron-rebuild -f -w yourmodule",
+    "build": "electron-packager . NM_project --arch=ia32 --version=1.0.0 --ignore=node_modules/electron-*"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
@@ -19,6 +20,7 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^1.4.1",
+    "electron-packager": "^8.4.0",
     "electron-rebuild": "^1.5.5"
   },
   "dependencies": {

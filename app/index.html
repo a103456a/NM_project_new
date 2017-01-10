@@ -22,12 +22,12 @@
 
         <ul class="left hide-on-med-and-down">
           <li><a href="#overview">總覽</a></li>
-          <li><a href="#portInfo">連接埠</a></li>
+          <li><a href="#portInfo">連接介面</a></li>
         </ul>
 
         <ul class="side-nav" id="mobile-demo">
           <li><a href="#overview">總覽</a></li>
-          <li><a href="#portInfo">連接埠</a></li>
+          <li><a href="#portInfo">連接介面</a></li>
         </ul>
 
         <ul class="right hide-on-med-and-down">
@@ -103,7 +103,34 @@
         </div>
         <div class="col s12 m6 l4">
           <div class="card-panel teal lighten-4">
-            <h6>裝置IPv4位置</h6>
+            <h6>系統啟動時間</h6>
+
+            <div class="row">
+              <div class="col s12 m12 l12">
+                <h7 id="uptime">載入中...</h7>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m6 l4">
+          <div class="card-panel teal lighten-4">
+            <h6>實體位置</h6>
+
+            <div class="row" style="margin-bottom: 0;">
+              <div class="col s9 m9 l9">
+                <h7 id="showLocation">載入中...</h7>
+                <input id="edit-location" style="margin-bottom: 0; height: 2em;" type="text">
+              </div>
+              <div class="col s3 m3 l3">
+                <a id="showLoc" class="btn-floating waves-effect waves-light blue"><i class="material-icons">edit</i></a>
+                <a id="editLoc" class="btn-floating waves-effect waves-light red"><i class="material-icons">edit</i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m6 l4">
+          <div class="card-panel teal lighten-4">
+            <h6>IPv4位置</h6>
 
             <div class="row">
               <div class="col s12 m12 l12">
@@ -114,7 +141,7 @@
         </div>
         <div class="col s12 m6 l4">
           <div class="card-panel teal lighten-4">
-            <h6>裝置MAC位置</h6>
+            <h6>MAC位置</h6>
 
             <div class="row">
               <div class="col s12 m12 l12">
@@ -123,6 +150,7 @@
             </div>
           </div>
         </div>
+
         <div class="col s12 m6 l4">
           <div class="card-panel teal lighten-4">
             <h6>總輸入封包量</h6>
@@ -136,11 +164,11 @@
         </div>
         <div class="col s12 m6 l4">
           <div class="card-panel teal lighten-4">
-            <h6>系統啟動時間</h6>
+            <h6>總輸出封包量</h6>
 
             <div class="row">
               <div class="col s12 m12 l12">
-                <h7 id="uptime">載入中...</h7>
+                <h7 id="showOpt">載入中...</h7>
               </div>
             </div>
           </div>
@@ -160,6 +188,7 @@
     </div>
   </div>
 </body>
+
 <!--Import jQuery before materialize.js-->
 <script type="text/javascript" src="./js/jquery-3.1.1.min.js"></script>
 <script type="text/javascript" src="./js/hammer.min.js"></script>
